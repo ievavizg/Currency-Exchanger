@@ -9,4 +9,5 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
 
     Currency findCurrencyById(Long id);
     Currency findCurrencyByFromCurrencyAndToCurrency(String FromCurrency, String ToCurrency);
+    Boolean existsByFromCurrencyAndToCurrency(String FromCurrency, String ToCurrency);
 }

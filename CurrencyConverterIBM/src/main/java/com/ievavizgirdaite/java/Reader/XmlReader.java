@@ -95,7 +95,15 @@ public class XmlReader {
                 }
             }
         }
-        currencyService.add(currency);
+        if (currencyService.checkIfDataExist(currency.getFromCurrency(), currency.getToCurrency()))
+        {
+            Currency curr = currencyService.findCurrencyExchangeRate(currency.getFromCurrency(), currency.getToCurrency());
+            curr.setTradeAmount(currency.getTradeAmount());
+            curr.setExchangeRate(currency.getExchangeRate());
+            curr.setDate(currency.getDate());
+            currencyService.update(curr);
+        }else
+            currencyService.add(currency);
         return currency;
     }
 

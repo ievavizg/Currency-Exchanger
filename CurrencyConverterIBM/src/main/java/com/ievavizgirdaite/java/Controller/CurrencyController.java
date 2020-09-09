@@ -5,7 +5,10 @@ import com.ievavizgirdaite.java.Entity.Repository.CurrencyRepository;
 import com.ievavizgirdaite.java.Reader.XmlReader;
 import com.ievavizgirdaite.java.Service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -46,7 +49,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/getExchanges")
-    public String getCurrenciesExchange() throws ParserConfigurationException, IOException, SAXException, ParseException
+    public String getCurrenciesExchange()
     {
        return xmlReader.readXml(currencyService.getCurrenciesInXml());
     }
@@ -57,4 +60,11 @@ public class CurrencyController {
         Currency currency = currencyService.findCurrencyExchangeRate(fromCurrency, toCurrency);
         return currency.getExchangeRate() * quantity;
     }
+
+    @GetMapping("/check")
+    public Boolean check(@RequestParam String fromCurrency, @RequestParam String toCurrency, @RequestParam Double quantity)
+    {
+        return currencyService.checkIfDataExist(fromCurrency, toCurrency);
+    }
+
 }

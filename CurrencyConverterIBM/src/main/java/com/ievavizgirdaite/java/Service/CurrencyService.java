@@ -43,4 +43,14 @@ public class CurrencyService {
     public Currency findCurrencyExchangeRate(String fromCurrency, String toCurrency){
         return currencyRepository.findCurrencyByFromCurrencyAndToCurrency(fromCurrency, toCurrency);
     }
+
+    @Transactional
+    public Boolean checkIfDataExist(String fromCurrency, String toCurrency){
+
+        if (currencyRepository.existsByFromCurrencyAndToCurrency(fromCurrency, toCurrency))
+        {
+            return true;
+        }
+        return false;
+    }
 }
