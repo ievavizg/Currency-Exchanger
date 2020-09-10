@@ -5,6 +5,7 @@ import com.ievavizgirdaite.java.Entity.Repository.CurrencyRepository;
 import com.ievavizgirdaite.java.Reader.XmlReader;
 import com.ievavizgirdaite.java.Service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 public class CurrencyController {
@@ -27,12 +29,13 @@ public class CurrencyController {
     private XmlReader xmlReader;
 
     @GetMapping("/list")
-    public Iterable<Currency> getCurrencies() {
+    public @ResponseBody List<Currency> getCurrencies() {
+
         return currencyRepository.findAll();
     }
 
     @GetMapping("/find/{id}")
-    public Currency findCurrencyExchangeById(@PathVariable Long id) {
+    public @ResponseBody Currency findCurrencyExchangeById(@PathVariable Long id) {
         return currencyRepository.findCurrencyById(id);
     }
 
@@ -49,22 +52,34 @@ public class CurrencyController {
     }
 
     @GetMapping("/getExchanges")
-    public String getCurrenciesExchange()
+    public ResponseEntity<?> getCurrenciesExchange()
     {
-       return xmlReader.readXml(currencyService.getCurrenciesInXml());
+       xmlReader.readXml(currencyService.getCurrenciesInXml());
+        return ResponseEntity.ok("User register successfully");
     }
 
     @GetMapping("/calculate")
-    public Double calculateExchange(@RequestParam String fromCurrency, @RequestParam String toCurrency, @RequestParam Double quantity)
+    public ResponseEntity<?> calculateExchange(@RequestParam String fromCurrency, @RequestParam String toCurrency, @RequestParam Double quantity)
     {
-        Currency currency = currencyService.findCurrencyExchangeRate(fromCurrency, toCurrency);
-        return currency.getExchangeRate() * quantity;
+        Currency currency = new Currency();
+        Double price = 0.0;
+
+        if (currencyService.checkIfDataExist(fromCurrency, toCurrency))
+        {
+            currency = currencyService.findCurrencyExchangeRate(fromCurrency, toCurrency);
+            price = currency.getExchangeRate() * quantity;
+        } else if (currencyService.checkIfDataExist(toCurrency, fromCurrency))
+        {
+            currency = currencyService.findCurrencyExchangeRate(toCurrency, fromCurrency);
+            price = quantity * (currency.getTradeAmount() / currency.getExchangeRate());
+        }
+        return ResponseEntity.ok(price);
     }
 
     @GetMapping("/check")
-    public Boolean check(@RequestParam String fromCurrency, @RequestParam String toCurrency, @RequestParam Double quantity)
+    public ResponseEntity<?> check(@RequestParam String fromCurrency, @RequestParam String toCurrency, @RequestParam Double quantity)
     {
-        return currencyService.checkIfDataExist(fromCurrency, toCurrency);
+        return ResponseEntity.ok(currencyService.checkIfDataExist(fromCurrency, toCurrency));
     }
 
 }
