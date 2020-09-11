@@ -30,7 +30,6 @@ public class CurrencyController {
 
     @GetMapping("/list")
     public @ResponseBody List<Currency> getCurrencies() {
-
         return currencyRepository.findAll();
     }
 
@@ -55,7 +54,7 @@ public class CurrencyController {
     public ResponseEntity<?> getCurrenciesExchange()
     {
        xmlReader.readXml(currencyService.getCurrenciesInXml());
-        return ResponseEntity.ok("User register successfully");
+       return ResponseEntity.ok("Loaded exchanges");
     }
 
     @GetMapping("/calculate")
